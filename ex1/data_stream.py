@@ -41,7 +41,8 @@ class SensorStream(DataStream):
 
             if temps:
                 avg_temp = sum(temps) / len(temps)
-                return f"Sensor analysis: {len(data_batch)} readings processed, avg temp: {avg_temp}°C"
+                return (f"Sensor analysis: {len(data_batch)} readings "
+                        f"processed, avg temp: {avg_temp}°C")
             else:
                 return f"- Sensor data: {len(data_batch)} readings processed"
         except Exception as e:
@@ -56,8 +57,10 @@ class TransactionStream(DataStream):
         try:
             self.processed_count += len(data_batch)
 
-            flows = [int(item.split(':')[1]) if item.startswith('buy:') else -int(item.split(':')[1])
-                     for item in data_batch if isinstance(item, str) and (item.startswith('buy:') or item.startswith('sell:'))]
+            flows = [int(item.split(':')[1]) if item.startswith('buy:')
+                     else -int(item.split(':')[1])
+                     for item in data_batch if isinstance(item, str) and
+                     (item.startswith('buy:') or item.startswith('sell:'))]
 
             if flows:
                 net_flow = sum(flows)
@@ -83,7 +86,8 @@ class EventStream(DataStream):
                       and item == 'error']
 
             if 'error' in data_batch:
-                return f"Event analysis: {len(data_batch)} events, {len(errors)} error detected"
+                return (f"Event analysis: {len(data_batch)} events, "
+                        f"{len(errors)} error detected")
             else:
                 return f"- Event data: {len(data_batch)} events processed"
         except Exception as e:
@@ -113,7 +117,8 @@ def main():
 
     print("\nInitializing Transaction Stream...")
     transaction = TransactionStream("TRANS_001")
-    print(f"Stream ID: {transaction.stream_id}, Type: {transaction.stream_type}")
+    print(f"Stream ID: {transaction.stream_id}, "
+          f"Type: {transaction.stream_type}")
     t_batch = ['buy:100', 'sell:150', 'buy:75']
     print(f"Processing transaction batch: [{', '.join(t_batch)}]")
     print(transaction.process_batch(t_batch))
